@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>POKERFISH</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+  <link rel="stylesheet" href="component/base.css">
+  <link rel="stylesheet" href="component/header.css">
+  <link rel="stylesheet" href="component/hero.css">
+  <link rel="stylesheet" href="component/products.css">
+  <link rel="stylesheet" href="component/cart.css">
+  <link rel="stylesheet" href="component/footer.css">
+  <link rel="stylesheet" href="component/toast.css">
+  <link rel="stylesheet" href="component/responsive.css">
+  <link rel="stylesheet" href="component/product-detail.css">
+  <script type="module" src="https://cdn.spline.design/@splinetool/hana-viewer@1.2.51/hana-viewer.js"></script>
+
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <a class="logo" href="#">Pokerfish</a>
+    <button class="cart-btn" onclick="toggleCart()" aria-label="Open cart">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+        <line x1="3" y1="6" x2="21" y2="6"/>
+        <path d="M16 10a4 4 0 01-8 0"/>
+      </svg>
+      <span class="cart-count" id="cartCount">0</span>
+    </button>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-spline">
+      <hana-viewer url="https://prod.spline.design/OrcQ94khC4PVxpmp-axY/scene.hanacode"></hana-viewer>
+    </div>
+    <div class="hero-tagline">
+      <p>필드에 올인, 모든 것을 걸다</p>
+      <p>All in on the field</p>
+    </div>
+  </section>
+
+  <!-- PRODUCTS -->
+  <section class="products-section">
+    <div class="product-grid" id="productGrid"></div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-left">
+      <span class="footer-logo">Pokerfish</span>
+      <span class="footer-copy">© 2026 Pokerfish. All rights reserved.</span>
+    </div>
+    <a class="footer-insta" href="https://www.instagram.com/pokerfish_offical/" target="_blank" rel="noopener" aria-label="Instagram">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+        <circle cx="12" cy="12" r="4"/>
+        <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none"/>
+      </svg>
+    </a>
+  </footer>
+
+  <!-- DETAIL (pages/product-detail.html) -->
+  <div class="detail-backdrop" id="detailBackdrop" onclick="closeDetail()"></div>
+  <div class="detail-panel" id="detailPanel">
+    <button class="detail-close" onclick="closeDetail()" aria-label="Close">×</button>
+    <div class="detail-body">
+      <div class="detail-gallery">
+        <div class="detail-img-wrap">
+          <img id="detailMainImg" src="" alt="">
+          <button class="detail-arrow prev" onclick="detailNav(-1)" aria-label="Previous">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="15 18 9 12 15 6"/>
+            </svg>
+          </button>
+          <button class="detail-arrow next" onclick="detailNav(1)" aria-label="Next">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+          </button>
+        </div>
+        <div class="detail-thumbs" id="detailThumbs"></div>
+      </div>
+      <div class="detail-info">
+        <h2 class="detail-name" id="detailName"></h2>
+        <div class="detail-price-wrap" id="detailPriceWrap"></div>
+        <div class="detail-divider"></div>
+        <div id="detailDesignSection" style="display:none">
+          <div class="detail-size-header">
+            <span class="detail-size-label">Design</span>
+          </div>
+          <div class="detail-sizes" id="detailDesigns"></div>
+          <div class="detail-size-error" id="detailDesignError">Please select a design</div>
+          <div class="detail-divider"></div>
+        </div>
+        <div class="detail-size-header">
+          <span class="detail-size-label">Color</span>
+        </div>
+        <div class="detail-color-swatches" id="detailColors"></div>
+        <div class="detail-size-error" id="detailColorError">Please select a color</div>
+        <div class="detail-divider"></div>
+        <div class="detail-size-header">
+          <span class="detail-size-label">Size</span>
+          <button class="detail-size-guide" onclick="openSizeGuide()">Size Guide</button>
+        </div>
+        <div class="detail-sizes" id="detailSizes"></div>
+        <div class="detail-size-error" id="detailSizeError">Please select a size</div>
+        <div class="detail-qty-wrap" id="detailQtyWrap" style="display:none">
+          <span class="detail-qty-label">Qty</span>
+          <div class="detail-qty-control">
+            <button class="qty-btn" onclick="changeDetailQty(-1)">−</button>
+            <span class="qty-value" id="detailQtyValue">1</span>
+            <button class="qty-btn" onclick="changeDetailQty(1)">+</button>
+          </div>
+        </div>
+        <div class="detail-btn-row">
+          <button class="detail-add-btn" onclick="detailAddToCart()">Add to Cart</button>
+          <button class="detail-buy-btn" onclick="detailBuyNow()">Buy</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIZE GUIDE MODAL -->
+  <div class="size-guide-backdrop" id="sizeGuideBackdrop" onclick="closeSizeGuide()"></div>
+  <div class="size-guide-modal" id="sizeGuideModal">
+    <button class="size-guide-close" onclick="closeSizeGuide()" aria-label="Close">×</button>
+    <img id="sizeGuideImg" src="" alt="Size Guide">
+  </div>
+
+  <!-- CART (pages/cart.html) -->
+  <div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
+  <div class="cart-panel" id="cartPanel">
+    <div class="cart-header">
+      <span class="cart-title">Your Cart</span>
+      <button class="cart-close" onclick="toggleCart()" aria-label="Close cart">×</button>
+    </div>
+    <div class="cart-items" id="cartItems">
+      <div class="cart-empty">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <path d="M16 10a4 4 0 01-8 0"/>
+        </svg>
+        <p>Your cart is empty</p>
+      </div>
+    </div>
+    <div class="cart-footer" id="cartFooter" style="display:none">
+      <div class="cart-total-row">
+        <span class="cart-total-label">Total</span>
+        <span class="cart-total-price" id="cartTotal">0원</span>
+      </div>
+      <button class="order-btn" id="orderBtn" onclick="goToCheckout()">
+        Order Now
+      </button>
+    </div>
+  </div>
+
+  <!-- TOAST (pages/toast.html) -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const ALL_PRODUCTS = [
+      {
+        id: 'p1',
+        name: 'Brand T-shirt',
+        price: 35000,
+        colors: ['블랙', '화이트'],
+        sizes: ['S', 'M', 'L', 'XL', '2XL', '3XL'],
+        sizeImage: 'images/Brand-White-사이즈표.png',
+        images: [
+          // 뒷면 (이름순)
+          'images/Brand-TShirt-뒷면.png',
+          'images/Brand-TShirt-뒷면2.jpg',
+          // 앞면
+          'images/Brand-TShirt.jpg',
+          // 컬러 (블랙 → 화이트)
+          'images/Brand-TShirt-블랙.png',
+          'images/Brand-TShirt-화이트.png'
+        ]
+      },
+      {
+        id: 'p2',
+        name: 'R.I.P Sweater',
+        price: 35000,
+        originalPrice: 45000,
+        designs: ['만새기', '고등어'],
+        colors: ['black', 'white'],
+        sizes: ['S', 'M', 'L', 'XL', '2XL'],
+        sizeImage: 'images/RIP-Sweater-Size.png',
+        images: [
+          // 뒷면 (이름순)
+          'images/RIP-sweater-뒷면.jpg',
+          'images/RIP-sweater-뒷면2.jpg',
+          // 앞면
+          'images/RIP-sweater.jpg',
+          'images/RIP-sweater2.jpg',
+          'images/RIP-sweater-만새기.png',
+          // 컬러 (블랙 → 화이트) × (만새기 → 고등어)
+          'images/RIP-sweater-만새기-black.png',
+          'images/RIP-sweater-고등어-black.png',
+          'images/RIP-sweater-고등어-white.png'
+        ]
+      },
+      {
+        id: 'p3',
+        name: 'R.I.P T-shirt',
+        price: 35000,
+        designs: ['만새기', '고등어'],
+        colors: ['black', '카키', 'white'],
+        sizes: ['S', 'M', 'L', 'XL', '2XL'],
+        sizeImage: 'images/RIP-TShirt-Size.png',
+        images: [
+          // 뒷면
+          'images/RIP-t-shirt-뒷면.jpg',
+          // 앞면
+          'images/RIP-t-shirt.jpg',
+          // 컬러 (블랙 → 카키 → 화이트) × (만새기 → 고등어)
+          'images/RIP-t-shirt-black-만새기.png',
+          'images/RIP-t-shirt-black-고등어.png',
+          'images/RIP-t-shirt-카키-만새기.png',
+          'images/RIP-t-shirt-카키-고등어.png',
+          'images/RIP-t-shirt-white-만새기.png',
+          'images/RIP-t-shirt-white-고등어.png'
+        ]
+      },
+      {
+        id: 'p4',
+        name: 'Yummy Sweater',
+        price: 35000,
+        originalPrice: 45000,
+        colors: ['블랙', '화이트'],
+        sizes: ['S', 'M', 'L', 'XL', '2XL'],
+        sizeImage: 'images/yummy-Sweater-Size.png',
+        images: [
+          // 뒷면 (이름순)
+          'images/yummy-부시리-뒷면.jpg',
+          'images/yummy-부시리-뒷면2.jpg',
+          // 컬러 (블랙 → 화이트)
+          'images/yummy-부시리-블랙.png',
+          'images/yummy-부시리-화이트.png'
+        ]
+      },
+      {
+        id: 'p5',
+        name: 'Yummy T-shirt',
+        price: 35000,
+        colors: ['블랙', '화이트'],
+        sizes: ['S', 'M', 'L', 'XL', '2XL'],
+        images: [
+          // 전용 이미지 없음 — Yummy 라인 공용 이미지 사용
+          'images/yummy-부시리-뒷면.jpg',
+          'images/yummy-부시리-블랙.png',
+          'images/yummy-부시리-화이트.png'
+        ]
+      }
+    ];
+
+    const fmt = n => n.toLocaleString('ko-KR') + '원';
+
+    const COLOR_HEX = {
+      '블랙': '#111111',
+      'black': '#111111',
+      '화이트': '#F0F0F0',
+      'white': '#F0F0F0',
+      '카키': '#7B7A57',
+    };
+
+    let cart = {}; // { [id]: { ...product, qty } }
+
+    // ── Render ─────────────────────────────────────────
+    function renderProducts() {
+      const grid = document.getElementById('productGrid');
+      grid.innerHTML = ALL_PRODUCTS.map(p => `
+        <div class="product-card">
+          <div class="product-image-wrap">
+            <img src="${p.images[0]}" alt="${p.name}" loading="lazy">
+            <div class="product-overlay"></div>
+            <div class="view-overlay">
+              <button class="view-btn" onclick="openDetail('${p.id}')">
+                <div class="view-btn-circle">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                  </svg>
+                </div>
+                <span class="view-btn-label">View</span>
+              </button>
+            </div>
+          </div>
+          <div class="product-info">
+            <div class="product-name">${p.name}</div>
+            ${p.originalPrice ? `
+            <div class="product-price-row">
+              <span class="product-price-sale">${fmt(p.price)}</span>
+              <span class="product-discount">${Math.round((1 - p.price / p.originalPrice) * 100)}%</span>
+              <span class="product-price-original">${fmt(p.originalPrice)}</span>
+            </div>` : `
+            <div class="product-price">${fmt(p.price)}</div>`}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // ── Cart logic ─────────────────────────────────────
+    function updateQty(cartKey, delta) {
+      if (!cart[cartKey]) return;
+      cart[cartKey].qty += delta;
+      if (cart[cartKey].qty <= 0) delete cart[cartKey];
+      updateCartUI();
+    }
+
+    function removeFromCart(cartKey) {
+      delete cart[cartKey];
+      updateCartUI();
+    }
+
+    // ── Detail panel ────────────────────────────────────
+    let currentProduct = null;
+    let selectedSize = null;
+    let selectedDesign = null;
+    let selectedColor = null;
+    let currentImgIndex = 0;
+    let detailQty = 1;
+
+    function openDetail(id) {
+      currentProduct = ALL_PRODUCTS.find(p => p.id === id);
+      if (!currentProduct) return;
+      selectedSize = null;
+      selectedDesign = null;
+      selectedColor = null;
+      currentImgIndex = 0;
+      detailQty = 1;
+      document.getElementById('detailQtyWrap').style.display = 'none';
+      document.getElementById('detailQtyValue').textContent = '1';
+
+      document.getElementById('detailMainImg').src = currentProduct.images[0];
+      document.getElementById('detailMainImg').alt = currentProduct.name;
+      document.getElementById('detailName').textContent = currentProduct.name;
+
+      const priceWrap = document.getElementById('detailPriceWrap');
+      if (currentProduct.originalPrice) {
+        const disc = Math.round((1 - currentProduct.price / currentProduct.originalPrice) * 100);
+        priceWrap.innerHTML = `
+          <div class="detail-price-row">
+            <span class="detail-price-sale">${fmt(currentProduct.price)}</span>
+            <span class="detail-discount-badge">${disc}%</span>
+            <span class="detail-price-original">${fmt(currentProduct.originalPrice)}</span>
+          </div>`;
+      } else {
+        priceWrap.innerHTML = `<span class="detail-price-single">${fmt(currentProduct.price)}</span>`;
+      }
+
+      document.getElementById('detailThumbs').innerHTML = currentProduct.images.map((img, i) =>
+        `<img class="detail-thumb${i === 0 ? ' active' : ''}" src="${img}" alt="" onclick="selectThumb(${i})">`
+      ).join('');
+
+      document.getElementById('detailSizes').innerHTML = currentProduct.sizes.map(s =>
+        `<button class="size-btn" onclick="selectSize('${s}')">${s}</button>`
+      ).join('');
+
+      const designSection = document.getElementById('detailDesignSection');
+      if (currentProduct.designs) {
+        designSection.style.display = 'block';
+        document.getElementById('detailDesigns').innerHTML = currentProduct.designs.map(d =>
+          `<button class="size-btn" onclick="selectDesign('${d}')">${d}</button>`
+        ).join('');
+        document.getElementById('detailDesignError').classList.remove('visible');
+      } else {
+        designSection.style.display = 'none';
+      }
+
+      document.getElementById('detailColors').innerHTML = currentProduct.colors.map(c => {
+        const hex = COLOR_HEX[c] || '#888';
+        const isLight = c === '화이트' || c === 'white';
+        return `<button class="color-swatch${isLight ? ' is-light' : ''}"
+                  style="background:${hex}"
+                  onclick="selectColor('${c}')"
+                  title="${c}"
+                  aria-label="${c}"></button>`;
+      }).join('');
+      document.getElementById('detailColorError').classList.remove('visible');
+
+      document.getElementById('detailSizeError').classList.remove('visible');
+
+      document.getElementById('detailBackdrop').classList.add('open');
+      document.getElementById('detailPanel').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeDetail() {
+      document.getElementById('detailBackdrop').classList.remove('open');
+      document.getElementById('detailPanel').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    function selectThumb(index) {
+      currentImgIndex = index;
+      const img = document.getElementById('detailMainImg');
+      img.classList.add('fade');
+      setTimeout(() => {
+        img.src = currentProduct.images[index];
+        img.classList.remove('fade');
+      }, 150);
+      document.querySelectorAll('.detail-thumb').forEach((t, i) => t.classList.toggle('active', i === index));
+    }
+
+    function detailNav(dir) {
+      const total = currentProduct.images.length;
+      selectThumb((currentImgIndex + dir + total) % total);
+    }
+
+    // 파일명에 키워드가 모두 포함된 첫 번째 이미지로 이동
+    // 전체 매칭 실패 시 마지막 키워드만으로 재시도
+    function jumpToImage(...keywords) {
+      let idx = currentProduct.images.findIndex(img => {
+        const name = img.split('/').pop();
+        return keywords.every(kw => name.includes(kw));
+      });
+      if (idx === -1) {
+        const last = keywords[keywords.length - 1];
+        idx = currentProduct.images.findIndex(img => img.split('/').pop().includes(last));
+      }
+      if (idx !== -1 && idx !== currentImgIndex) selectThumb(idx);
+    }
+
+    function checkShowQty() {
+      const ready = selectedColor && selectedSize;
+      document.getElementById('detailQtyWrap').style.display = ready ? 'flex' : 'none';
+    }
+
+    function changeDetailQty(delta) {
+      detailQty = Math.max(1, detailQty + delta);
+      document.getElementById('detailQtyValue').textContent = detailQty;
+    }
+
+    function selectColor(color) {
+      selectedColor = color;
+      document.querySelectorAll('#detailColors .color-swatch').forEach(btn =>
+        btn.classList.toggle('selected', btn.title === color)
+      );
+      document.getElementById('detailColorError').classList.remove('visible');
+      selectedDesign ? jumpToImage(selectedDesign, color) : jumpToImage(color);
+      checkShowQty();
+    }
+
+    function selectDesign(design) {
+      selectedDesign = design;
+      document.querySelectorAll('#detailDesigns .size-btn').forEach(btn =>
+        btn.classList.toggle('selected', btn.textContent.trim() === design)
+      );
+      document.getElementById('detailDesignError').classList.remove('visible');
+      selectedColor ? jumpToImage(design, selectedColor) : jumpToImage(design);
+    }
+
+    function selectSize(size) {
+      selectedSize = size;
+      document.querySelectorAll('.size-btn').forEach(btn =>
+        btn.classList.toggle('selected', btn.textContent.trim() === size)
+      );
+      document.getElementById('detailSizeError').classList.remove('visible');
+      checkShowQty();
+    }
+
+    function detailAddToCart() {
+      if (currentProduct.designs && !selectedDesign) {
+        document.getElementById('detailDesignError').classList.add('visible');
+        const designsEl = document.getElementById('detailDesigns');
+        designsEl.classList.remove('shake');
+        void designsEl.offsetWidth;
+        designsEl.classList.add('shake');
+        return;
+      }
+      if (!selectedColor) {
+        document.getElementById('detailColorError').classList.add('visible');
+        const colorsEl = document.getElementById('detailColors');
+        colorsEl.classList.remove('shake');
+        void colorsEl.offsetWidth; // reflow
+        colorsEl.classList.add('shake');
+        return;
+      }
+      if (!selectedSize) {
+        document.getElementById('detailSizeError').classList.add('visible');
+        const sizesEl = document.getElementById('detailSizes');
+        sizesEl.classList.remove('shake');
+        void sizesEl.offsetWidth;
+        sizesEl.classList.add('shake');
+        return;
+      }
+      const cartKey = `${currentProduct.id}_${selectedDesign ?? ''}_${selectedColor}_${selectedSize}`;
+      const label = [selectedDesign, selectedColor, selectedSize].filter(Boolean).join(' · ');
+      if (cart[cartKey]) {
+        cart[cartKey].qty += detailQty;
+      } else {
+        cart[cartKey] = { ...currentProduct, design: selectedDesign, color: selectedColor, size: selectedSize, cartKey, qty: detailQty };
+      }
+      updateCartUI();
+      showToast(`${currentProduct.name} (${label}) added`);
+      closeDetail();
+    }
+
+    function detailBuyNow() {
+      if (currentProduct.designs && !selectedDesign) {
+        document.getElementById('detailDesignError').classList.add('visible');
+        const designsEl = document.getElementById('detailDesigns');
+        designsEl.classList.remove('shake'); void designsEl.offsetWidth; designsEl.classList.add('shake');
+        return;
+      }
+      if (!selectedColor) {
+        document.getElementById('detailColorError').classList.add('visible');
+        const colorsEl = document.getElementById('detailColors');
+        colorsEl.classList.remove('shake'); void colorsEl.offsetWidth; colorsEl.classList.add('shake');
+        return;
+      }
+      if (!selectedSize) {
+        document.getElementById('detailSizeError').classList.add('visible');
+        const sizesEl = document.getElementById('detailSizes');
+        sizesEl.classList.remove('shake'); void sizesEl.offsetWidth; sizesEl.classList.add('shake');
+        return;
+      }
+      detailAddToCart();
+      closeDetail();
+      toggleCart();
+    }
+
+    function updateCartUI() {
+      const items = Object.values(cart);
+      const count = items.reduce((s, i) => s + i.qty, 0);
+      const total = items.reduce((s, i) => s + i.price * i.qty, 0);
+
+      const countEl = document.getElementById('cartCount');
+      countEl.textContent = count;
+      countEl.classList.toggle('visible', count > 0);
+
+      const itemsEl = document.getElementById('cartItems');
+      const footerEl = document.getElementById('cartFooter');
+
+      if (!items.length) {
+        itemsEl.innerHTML = `
+          <div class="cart-empty">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+              <line x1="3" y1="6" x2="21" y2="6"/>
+              <path d="M16 10a4 4 0 01-8 0"/>
+            </svg>
+            <p>Your cart is empty</p>
+          </div>`;
+        footerEl.style.display = 'none';
+        return;
+      }
+
+      itemsEl.innerHTML = items.map(item => `
+        <div class="cart-item">
+          <img class="cart-item-img" src="${item.images[0]}" alt="${item.name}">
+          <div>
+            <div class="cart-item-name">${item.name}</div>
+            <div class="cart-item-price">${fmt(item.price)}${[item.design, item.color, item.size].filter(Boolean).map(v => ' · ' + v).join('')}</div>
+            <div class="cart-item-qty">
+              <button class="qty-btn" onclick="updateQty('${item.cartKey}', -1)">−</button>
+              <span class="qty-value">${item.qty}</span>
+              <button class="qty-btn" onclick="updateQty('${item.cartKey}', 1)">+</button>
+            </div>
+          </div>
+          <button class="cart-item-remove" onclick="removeFromCart('${item.cartKey}')" aria-label="Remove">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+      `).join('');
+
+      document.getElementById('cartTotal').textContent = fmt(total);
+      footerEl.style.display = 'block';
+    }
+
+    // ── Cart panel ─────────────────────────────────────
+    function toggleCart() {
+      const overlay = document.getElementById('cartOverlay');
+      const panel = document.getElementById('cartPanel');
+      const isOpen = panel.classList.contains('open');
+      overlay.classList.toggle('open', !isOpen);
+      panel.classList.toggle('open', !isOpen);
+      document.body.style.overflow = isOpen ? '' : 'hidden';
+    }
+
+    // ── Toast ──────────────────────────────────────────
+    let toastTimer;
+    function showToast(msg) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => el.classList.remove('show'), 2000);
+    }
+
+    // ── Checkout ───────────────────────────────────────
+    function goToCheckout() {
+      localStorage.setItem('pf_cart', JSON.stringify(cart));
+      window.location.href = 'checkout.html';
+    }
+
+    // ── Size Guide ─────────────────────────────────────
+    function openSizeGuide() {
+      if (!currentProduct || !currentProduct.sizeImage) return;
+      document.getElementById('sizeGuideImg').src = currentProduct.sizeImage;
+      document.getElementById('sizeGuideBackdrop').classList.add('open');
+      document.getElementById('sizeGuideModal').classList.add('open');
+    }
+
+    function closeSizeGuide() {
+      document.getElementById('sizeGuideBackdrop').classList.remove('open');
+      document.getElementById('sizeGuideModal').classList.remove('open');
+    }
+
+    // ── Init ───────────────────────────────────────────
+    renderProducts();
+  </script>
+</body>
+</html>

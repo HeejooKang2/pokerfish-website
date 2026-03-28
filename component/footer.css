@@ -1,0 +1,38 @@
+.footer {
+  padding: 56px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.footer-logo {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.38em;
+  text-transform: uppercase;
+}
+.footer-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.footer-copy {
+  font-size: 11px;
+  color: var(--gray-600);
+  letter-spacing: 0.05em;
+}
+.footer-insta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.5);
+  color: var(--white);
+  transition: border-color 0.2s, background 0.2s;
+}
+.footer-insta:hover {
+  border-color: var(--white);
+  background: rgba(255,255,255,0.08);
+}

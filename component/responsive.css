@@ -1,0 +1,13 @@
+@media (max-width: 860px) {
+  .header { padding: 20px 28px; }
+  .products-section { padding: 100px 28px 80px; }
+  .product-grid { grid-template-columns: repeat(2, 1fr); }
+  .footer { padding: 44px 28px; }
+}
+
+@media (max-width: 560px) {
+  .hero-title { font-size: 54px; }
+  .hero-tagline { font-size: 20px; }
+  .cart-panel { width: 100%; }
+  .footer { flex-direction: column; gap: 14px; padding: 36px 24px; text-align: center; }
+}

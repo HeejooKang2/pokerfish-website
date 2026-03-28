@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout — POKERFISH</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+  <link rel="stylesheet" href="component/base.css">
+  <link rel="stylesheet" href="component/checkout.css">
+  <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+</head>
+<body>
+
+  <header class="co-header">
+    <a class="co-logo" href="index.html">Pokerfish</a>
+    <span class="co-step">Checkout</span>
+  </header>
+
+  <main class="co-main">
+
+    <!-- 주문 요약 -->
+    <section class="co-card">
+      <h2 class="co-section-title">Order Summary</h2>
+      <div id="coItems"></div>
+      <div class="co-total-row">
+        <span class="co-total-label">Total</span>
+        <span class="co-total-price" id="coTotal">0원</span>
+      </div>
+    </section>
+
+    <!-- 배송 정보 -->
+    <section class="co-card">
+      <h2 class="co-section-title">Delivery Info</h2>
+      <div class="co-form">
+        <div class="co-field">
+          <label class="co-label" for="coName">이름</label>
+          <input class="co-input" id="coName" type="text" placeholder="홍길동" autocomplete="name">
+        </div>
+        <div class="co-field">
+          <label class="co-label" for="coPhone">전화번호</label>
+          <input class="co-input" id="coPhone" type="tel" placeholder="010-0000-0000" autocomplete="tel">
+        </div>
+        <div class="co-field">
+          <label class="co-label">주소</label>
+          <div class="co-addr-row">
+            <input class="co-input co-input-postcode" id="coPostcode" type="text" placeholder="우편번호" readonly>
+            <button class="co-addr-search-btn" onclick="searchAddress()">주소 찾기</button>
+          </div>
+          <input class="co-input co-input-addr" id="coAddr" type="text" placeholder="기본 주소" readonly>
+          <input class="co-input co-input-addr" id="coAddrDetail" type="text" placeholder="상세 주소 입력">
+        </div>
+        <div class="co-field">
+          <label class="co-label" for="coMessage">배송 메시지</label>
+          <select class="co-input co-select" id="coMessage" onchange="handleMessageSelect(this)">
+            <option value="">선택해주세요</option>
+            <option value="문 앞에 놓아주세요">문 앞에 놓아주세요</option>
+            <option value="경비실에 맡겨주세요">경비실에 맡겨주세요</option>
+            <option value="배송 전 연락 부탁드려요">배송 전 연락 부탁드려요</option>
+            <option value="직접 입력">직접 입력</option>
+          </select>
+          <input class="co-input co-input-addr" id="coMessageCustom" type="text" placeholder="배송 메시지를 입력해주세요" style="display:none; margin-top:8px;">
+        </div>
+      </div>
+    </section>
+
+    <!-- 결제 방식 -->
+    <section class="co-card">
+      <h2 class="co-section-title">Payment</h2>
+      <div class="co-pay-methods">
+        <button class="co-pay-btn selected" data-method="계좌이체" onclick="selectPayment(this)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="5" width="20" height="14" rx="2"/>
+            <line x1="2" y1="10" x2="22" y2="10"/>
+          </svg>
+          계좌이체
+        </button>
+        <button class="co-pay-btn" data-method="카카오페이" onclick="selectPayment(this)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M8 12s1-3 4-3 4 3 4 3"/>
+            <line x1="12" y1="12" x2="12" y2="15"/>
+          </svg>
+          카카오페이
+        </button>
+        <button class="co-pay-btn" data-method="네이버페이" onclick="selectPayment(this)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+          </svg>
+          네이버페이
+        </button>
+        <button class="co-pay-btn" data-method="신용카드" onclick="selectPayment(this)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="5" width="20" height="14" rx="2"/>
+            <line x1="2" y1="10" x2="22" y2="10"/>
+            <line x1="6" y1="15" x2="10" y2="15"/>
+          </svg>
+          신용카드
+        </button>
+      </div>
+
+      <!-- 계좌이체 안내 -->
+      <div class="co-bank-info" id="coBankInfo">
+        <p class="co-bank-title">입금 계좌 안내</p>
+        <p class="co-bank-detail">우리은행 · 1002-750-473690 · 예금주: 강X주</p>
+        <p class="co-bank-note">주문 완료 후 24시간 이내 입금 확인 후 발송됩니다.</p>
+      </div>
+    </section>
+
+    <button class="co-confirm-btn" onclick="submitOrder()">주문 완료</button>
+
+  </main>
+
+  <!-- 완료 모달 -->
+  <div class="co-done-backdrop" id="coDoneBackdrop"></div>
+  <div class="co-done-modal" id="coDoneModal">
+    <div class="co-done-icon">✓</div>
+    <p class="co-done-title">주문이 완료되었습니다</p>
+    <p class="co-done-sub">입금 확인 후 발송 안내 문자를 보내드립니다.</p>
+    <button class="co-done-btn" onclick="window.location.href='index.html'">쇼핑 계속하기</button>
+  </div>
+
+  <script>
+    const fmt = n => n.toLocaleString('ko-KR') + '원';
+    let cart = {};
+    let selectedPayment = '계좌이체';
+
+    // 카트 불러오기
+    try { cart = JSON.parse(localStorage.getItem('pf_cart') || '{}'); } catch(e) {}
+
+    function renderSummary() {
+      const items = Object.values(cart);
+      const total = items.reduce((s, i) => s + i.price * i.qty, 0);
+
+      document.getElementById('coItems').innerHTML = items.length
+        ? items.map(item => `
+          <div class="co-item">
+            <img class="co-item-img" src="${item.images[0]}" alt="${item.name}">
+            <div class="co-item-info">
+              <p class="co-item-name">${item.name}</p>
+              <p class="co-item-meta">${[item.design, item.color, item.size].filter(Boolean).join(' · ')}</p>
+              <p class="co-item-price">${fmt(item.price)} × ${item.qty}</p>
+            </div>
+          </div>`).join('')
+        : '<p class="co-empty">장바구니가 비어 있습니다.</p>';
+
+      document.getElementById('coTotal').textContent = fmt(total);
+    }
+
+    function searchAddress() {
+      new daum.Postcode({
+        oncomplete(data) {
+          document.getElementById('coPostcode').value = data.zonecode;
+          document.getElementById('coAddr').value = data.roadAddress || data.jibunAddress;
+          document.getElementById('coAddrDetail').focus();
+        }
+      }).open();
+    }
+
+    function handleMessageSelect(el) {
+      const custom = document.getElementById('coMessageCustom');
+      custom.style.display = el.value === '직접 입력' ? 'block' : 'none';
+    }
+
+    function selectPayment(btn) {
+      document.querySelectorAll('.co-pay-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      selectedPayment = btn.dataset.method;
+      document.getElementById('coBankInfo').style.display = selectedPayment === '계좌이체' ? 'block' : 'none';
+    }
+
+    function submitOrder() {
+      const name    = document.getElementById('coName').value.trim();
+      const phone   = document.getElementById('coPhone').value.trim();
+      const post    = document.getElementById('coPostcode').value.trim();
+      const addr    = document.getElementById('coAddr').value.trim();
+      const detail  = document.getElementById('coAddrDetail').value.trim();
+      const msgEl   = document.getElementById('coMessage');
+      const msgCustom = document.getElementById('coMessageCustom').value.trim();
+      const message = msgEl.value === '직접 입력' ? msgCustom : msgEl.value;
+
+      if (!name)   return alert('이름을 입력해주세요.');
+      if (!phone)  return alert('전화번호를 입력해주세요.');
+      if (!post || !addr) return alert('주소를 입력해주세요.');
+      if (!detail) return alert('상세 주소를 입력해주세요.');
+
+      // 실제 결제 연동 전 — 주문 정보 콘솔 출력
+      console.log('주문 정보', {
+        name, phone,
+        address: `(${post}) ${addr} ${detail}`,
+        message,
+        payment: selectedPayment,
+        cart,
+      });
+
+      localStorage.removeItem('pf_cart');
+      document.getElementById('coDoneBackdrop').classList.add('open');
+      document.getElementById('coDoneModal').classList.add('open');
+    }
+
+    renderSummary();
+  </script>
+</body>
+</html>

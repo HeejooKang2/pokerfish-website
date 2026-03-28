@@ -1,0 +1,48 @@
+<div class="detail-backdrop" id="detailBackdrop" onclick="closeDetail()"></div>
+<div class="detail-panel" id="detailPanel">
+  <button class="detail-close" onclick="closeDetail()" aria-label="Close">×</button>
+  <div class="detail-body">
+    <div class="detail-gallery">
+      <div class="detail-img-wrap">
+        <img id="detailMainImg" src="" alt="">
+        <button class="detail-arrow prev" onclick="detailNav(-1)" aria-label="Previous">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+        </button>
+        <button class="detail-arrow next" onclick="detailNav(1)" aria-label="Next">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+        </button>
+      </div>
+      <div class="detail-thumbs" id="detailThumbs"></div>
+    </div>
+    <div class="detail-info">
+      <h2 class="detail-name" id="detailName"></h2>
+      <div class="detail-price-wrap" id="detailPriceWrap"></div>
+      <div class="detail-divider"></div>
+      <div id="detailDesignSection" style="display:none">
+        <div class="detail-size-header">
+          <span class="detail-size-label">Design</span>
+        </div>
+        <div class="detail-sizes" id="detailDesigns"></div>
+        <div class="detail-size-error" id="detailDesignError">Please select a design</div>
+        <div class="detail-divider"></div>
+      </div>
+      <div class="detail-size-header">
+        <span class="detail-size-label">Color</span>
+      </div>
+      <div class="detail-color-swatches" id="detailColors"></div>
+      <div class="detail-size-error" id="detailColorError">Please select a color</div>
+      <div class="detail-divider"></div>
+      <div class="detail-size-header">
+        <span class="detail-size-label">Size</span>
+        <button class="detail-size-guide">Size Guide</button>
+      </div>
+      <div class="detail-sizes" id="detailSizes"></div>
+      <div class="detail-size-error" id="detailSizeError">Please select a size</div>
+      <button class="detail-add-btn" onclick="detailAddToCart()">Add to Cart</button>
+    </div>
+  </div>
+</div>

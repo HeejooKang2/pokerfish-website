@@ -9,5 +9,5 @@
   .hero-title { font-size: 54px; }
   .hero-tagline { font-size: 20px; }
   .cart-panel { width: 100%; }
-  .footer { flex-direction: column; gap: 14px; padding: 36px 24px; text-align: center; }
+  .footer-left { flex-direction: column; align-items: flex-start; gap: 4px; }
 }

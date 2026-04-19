@@ -28,6 +28,10 @@
   color: var(--gray-600);
   letter-spacing: 0.05em;
 }
+.footer-social {
+  display: flex;
+  gap: 10px;
+}
 .footer-insta {
   display: flex;
   align-items: center;

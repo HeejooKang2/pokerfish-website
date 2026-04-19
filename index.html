@@ -55,13 +55,20 @@
         <span class="footer-logo">Pokerfish</span>
         <span class="footer-copy">© 2026 Pokerfish. All rights reserved.</span>
       </div>
-      <a class="footer-insta" href="https://www.instagram.com/pokerfish_offical/" target="_blank" rel="noopener" aria-label="Instagram">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
-          <circle cx="12" cy="12" r="4"/>
-          <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none"/>
-        </svg>
-      </a>
+      <div class="footer-social">
+        <a class="footer-insta" href="https://www.instagram.com/pokerfish_offical/" target="_blank" rel="noopener" aria-label="Instagram">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+            <circle cx="12" cy="12" r="4"/>
+            <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none"/>
+          </svg>
+        </a>
+        <a class="footer-insta" href="https://pf.kakao.com/_lxnLxmn" target="_blank" rel="noopener" aria-label="KakaoTalk">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3C6.98 3 3 6.36 3 10.5c0 2.6 1.6 4.9 4 6.3l-.9 3.4 3.8-2.3c.67.1 1.37.1 2.1.1 5.02 0 9-3.36 9-7.5S17.02 3 12 3z"/>
+          </svg>
+        </a>
+      </div>
     </div>
     <div class="footer-links">
       <a class="footer-link" href="pages/terms.html">이용약관</a>
@@ -283,7 +290,11 @@
       '카키': '#7B7A57',
     };
 
-    let cart = {}; // { [id]: { ...product, qty } }
+    let cart = {};
+    try {
+      const saved = localStorage.getItem('pf_cart');
+      if (saved) cart = JSON.parse(saved);
+    } catch(e) {}
 
     // ── Render ─────────────────────────────────────────
     function renderProducts() {
@@ -434,8 +445,8 @@
         return keywords.every(kw => name.includes(kw));
       });
       if (idx === -1) {
-        const last = keywords[keywords.length - 1];
-        idx = currentProduct.images.findIndex(img => img.split('/').pop().includes(last));
+        // 조합 이미지가 없을 때 디자인(첫 번째 키워드) 우선 fallback
+        idx = currentProduct.images.findIndex(img => img.split('/').pop().includes(keywords[0]));
       }
       if (idx !== -1 && idx !== currentImgIndex) selectThumb(idx);
     }
@@ -540,6 +551,7 @@
     }
 
     function updateCartUI() {
+      localStorage.setItem('pf_cart', JSON.stringify(cart));
       const items = Object.values(cart);
       const count = items.reduce((s, i) => s + i.qty, 0);
       const total = items.reduce((s, i) => s + i.price * i.qty, 0);

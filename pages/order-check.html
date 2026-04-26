@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>주문 조회 — POKERFISH</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+  <link rel="stylesheet" href="../component/base.css">
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 96px 24px 64px;
+    }
+
+    .oc-header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 40px;
+      background: var(--black);
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      z-index: 100;
+    }
+    .oc-logo {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.38em;
+      text-transform: uppercase;
+      color: var(--white);
+      text-decoration: none;
+    }
+    .oc-header-title {
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gray-400);
+    }
+
+    .oc-wrap {
+      width: 100%;
+      max-width: 520px;
+    }
+
+    .oc-page-title {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 32px;
+    }
+
+    .oc-card {
+      background: var(--gray-900);
+      border: 1px solid rgba(255,255,255,0.07);
+      padding: 36px 32px;
+      margin-bottom: 16px;
+    }
+
+    .oc-section-title {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--gray-400);
+      margin-bottom: 20px;
+    }
+
+    .oc-field {
+      margin-bottom: 16px;
+    }
+    .oc-label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      color: var(--gray-400);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+    .oc-input {
+      width: 100%;
+      background: var(--black);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: var(--white);
+      font-family: 'Pretendard', sans-serif;
+      font-size: 13px;
+      padding: 14px 16px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .oc-input:focus { border-color: rgba(255,255,255,0.4); }
+    .oc-input::placeholder { color: var(--gray-600); }
+
+    .oc-btn {
+      width: 100%;
+      padding: 16px;
+      background: var(--white);
+      color: var(--black);
+      border: none;
+      font-family: 'Pretendard', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.15s;
+      margin-top: 4px;
+    }
+    .oc-btn:hover { background: var(--gray-100); }
+    .oc-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .oc-error {
+      font-size: 12px;
+      color: #e05555;
+      background: rgba(220,50,50,0.08);
+      border: 1px solid rgba(220,50,50,0.2);
+      padding: 13px 16px;
+      margin-top: 16px;
+      display: none;
+    }
+
+    /* 주문 결과 */
+    #ocResult { display: none; }
+
+    .oc-status-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border: 1px solid;
+    }
+    .status-결제완료  { color: #6fa3ef; border-color: rgba(111,163,239,0.4); background: rgba(111,163,239,0.08); }
+    .status-배송준비  { color: #f0c040; border-color: rgba(240,192,64,0.4);  background: rgba(240,192,64,0.08);  }
+    .status-배송중   { color: #5dcfa0; border-color: rgba(93,207,160,0.4);   background: rgba(93,207,160,0.08);  }
+    .status-배송완료  { color: var(--gray-400); border-color: rgba(136,136,136,0.3); background: rgba(136,136,136,0.06); }
+    .status-취소완료  { color: #e05555; border-color: rgba(220,85,85,0.3);   background: rgba(220,85,85,0.06);   }
+
+    .oc-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .oc-table td {
+      padding: 11px 0;
+      font-size: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      vertical-align: top;
+    }
+    .oc-table td:first-child {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gray-400);
+      width: 35%;
+      padding-right: 12px;
+    }
+
+    .oc-items { list-style: none; }
+    .oc-items li {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .oc-items li:last-child { border-bottom: none; }
+    .oc-item-img {
+      width: 56px;
+      height: 56px;
+      object-fit: cover;
+      flex-shrink: 0;
+      background: var(--gray-800);
+    }
+    .oc-item-name { font-size: 12px; font-weight: 500; margin-bottom: 4px; }
+    .oc-item-meta { font-size: 11px; color: var(--gray-400); margin-bottom: 4px; }
+    .oc-item-price { font-size: 12px; }
+
+    .oc-tracking {
+      font-size: 12px;
+      color: #5dcfa0;
+      margin-top: 4px;
+    }
+
+    .oc-cancel-btn {
+      width: 100%;
+      padding: 15px;
+      background: none;
+      color: #e05555;
+      border: 1px solid rgba(220,85,85,0.35);
+      font-family: 'Pretendard', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+      margin-top: 16px;
+    }
+    .oc-cancel-btn:hover { background: rgba(220,85,85,0.07); border-color: rgba(220,85,85,0.6); }
+
+    .oc-cancel-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .oc-cancel-modal.open { display: flex; }
+    .oc-modal-box {
+      background: var(--gray-900);
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 36px 32px;
+      width: 100%;
+      max-width: 400px;
+    }
+    .oc-modal-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .oc-modal-sub {
+      font-size: 12px;
+      color: var(--gray-400);
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+    .oc-modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .oc-modal-cancel-ok {
+      flex: 1;
+      padding: 14px;
+      background: #e05555;
+      color: var(--white);
+      border: none;
+      font-family: 'Pretendard', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+    }
+    .oc-modal-close {
+      flex: 1;
+      padding: 14px;
+      background: none;
+      color: var(--white);
+      border: 1px solid rgba(255,255,255,0.2);
+      font-family: 'Pretendard', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    @media (max-width: 560px) {
+      .oc-header { padding: 0 20px; }
+      .oc-card { padding: 28px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="oc-header">
+    <a class="oc-logo" href="../index.html">Pokerfish</a>
+    <span class="oc-header-title">Order Lookup</span>
+  </header>
+
+  <div class="oc-wrap">
+    <h1 class="oc-page-title">주문 조회</h1>
+
+    <div class="oc-card">
+      <p class="oc-section-title">주문 정보 입력</p>
+      <div class="oc-field">
+        <label class="oc-label" for="ocOrderId">주문번호</label>
+        <input class="oc-input" id="ocOrderId" type="text" placeholder="PF1234567890">
+      </div>
+      <div class="oc-field">
+        <label class="oc-label" for="ocPhone4">휴대폰 뒤 4자리</label>
+        <input class="oc-input" id="ocPhone4" type="text" maxlength="4" placeholder="1234" inputmode="numeric">
+      </div>
+      <button class="oc-btn" id="ocSearchBtn" onclick="searchOrder()">조회하기</button>
+      <div class="oc-error" id="ocError"></div>
+    </div>
+
+    <!-- 주문 결과 -->
+    <div id="ocResult">
+      <div class="oc-card">
+        <p class="oc-section-title">주문 상태</p>
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
+          <span id="ocStatusBadge" class="oc-status-badge"></span>
+          <span id="ocOrderDate" style="font-size:11px; color:var(--gray-400);"></span>
+        </div>
+        <table class="oc-table">
+          <tbody id="ocInfoRows"></tbody>
+        </table>
+        <div id="ocTrackingWrap" style="display:none; margin-top:16px; padding:14px 16px; background:rgba(93,207,160,0.06); border:1px solid rgba(93,207,160,0.2);">
+          <p style="font-size:10px; font-weight:700; letter-spacing:0.15em; color:#5dcfa0; margin-bottom:4px;">TRACKING</p>
+          <p id="ocTrackingNum" class="oc-tracking"></p>
+        </div>
+      </div>
+
+      <div class="oc-card">
+        <p class="oc-section-title">주문 상품</p>
+        <ul class="oc-items" id="ocItemList"></ul>
+        <div style="display:flex; justify-content:space-between; align-items:center; padding-top:16px; margin-top:4px; border-top:1px solid rgba(255,255,255,0.08);">
+          <span style="font-size:11px; color:var(--gray-400);">총 결제금액</span>
+          <span id="ocTotalAmount" style="font-size:15px; font-weight:700;"></span>
+        </div>
+      </div>
+
+      <button class="oc-cancel-btn" id="ocCancelBtn" onclick="openCancelModal()">주문 취소 신청</button>
+    </div>
+  </div>
+
+  <!-- 취소 확인 모달 -->
+  <div class="oc-cancel-modal" id="ocCancelModal">
+    <div class="oc-modal-box">
+      <p class="oc-modal-title">주문을 취소하시겠습니까?</p>
+      <p class="oc-modal-sub">취소 시 즉시 환불이 진행됩니다.<br>배송 중·완료 건은 취소가 불가합니다.</p>
+      <div class="oc-field">
+        <label class="oc-label" for="ocCancelReason">취소 사유</label>
+        <input class="oc-input" id="ocCancelReason" type="text" placeholder="단순 변심">
+      </div>
+      <div class="oc-modal-actions">
+        <button class="oc-modal-close" onclick="closeCancelModal()">돌아가기</button>
+        <button class="oc-modal-cancel-ok" onclick="confirmCancel()">취소 확인</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const SERVER = 'http://localhost:3000';
+    const fmt = n => Number(n).toLocaleString('ko-KR') + '원';
+
+    let currentOrder = null;
+
+    async function searchOrder() {
+      const orderId = document.getElementById('ocOrderId').value.trim();
+      const phone4  = document.getElementById('ocPhone4').value.trim();
+      const errEl   = document.getElementById('ocError');
+      const btn     = document.getElementById('ocSearchBtn');
+
+      errEl.style.display = 'none';
+      if (!orderId || !phone4) { showError('주문번호와 전화번호 뒤 4자리를 입력해주세요.'); return; }
+
+      btn.disabled = true;
+      btn.textContent = '조회 중...';
+
+      try {
+        const res = await fetch(`${SERVER}/api/order?orderId=${encodeURIComponent(orderId)}&phone4=${encodeURIComponent(phone4)}`);
+        const data = await res.json();
+        if (!res.ok) { showError(data.error || '조회에 실패했습니다.'); return; }
+        currentOrder = data;
+        renderResult(data);
+      } catch(e) {
+        showError('서버 연결에 실패했습니다.');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '조회하기';
+      }
+    }
+
+    function showError(msg) {
+      const el = document.getElementById('ocError');
+      el.textContent = msg;
+      el.style.display = 'block';
+    }
+
+    function renderResult(o) {
+      const statusEl = document.getElementById('ocStatusBadge');
+      statusEl.textContent = o.status;
+      statusEl.className = `oc-status-badge status-${o.status}`;
+      document.getElementById('ocOrderDate').textContent = o.created_at;
+
+      const rows = [
+        ['주문번호', o.order_id],
+        ['받는 분',  o.name],
+        ['연락처',   o.phone],
+        ['배송지',   o.address],
+        ['결제수단', o.payment_method],
+        ...(o.message ? [['배송 메시지', o.message]] : []),
+        ...(o.cancel_reason ? [['취소 사유', o.cancel_reason]] : []),
+        ...(o.cancelled_at  ? [['취소 일시', o.cancelled_at]]  : []),
+      ];
+      document.getElementById('ocInfoRows').innerHTML = rows
+        .map(([k,v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join('');
+
+      if (o.tracking_number) {
+        document.getElementById('ocTrackingWrap').style.display = 'block';
+        document.getElementById('ocTrackingNum').textContent = o.tracking_number;
+      } else {
+        document.getElementById('ocTrackingWrap').style.display = 'none';
+      }
+
+      const items = Array.isArray(o.items) ? o.items : [];
+      document.getElementById('ocItemList').innerHTML = items.map(item => {
+        const opts = [item.design, item.color, item.size].filter(Boolean).join(' · ');
+        const img  = item.images?.[0] ? `../${item.images[0]}` : '';
+        return `
+          <li>
+            ${img ? `<img class="oc-item-img" src="${img}" alt="${item.name}">` : '<div class="oc-item-img"></div>'}
+            <div>
+              <p class="oc-item-name">${item.name}</p>
+              ${opts ? `<p class="oc-item-meta">${opts}</p>` : ''}
+              <p class="oc-item-price">${fmt(item.price)} × ${item.qty}</p>
+            </div>
+          </li>`;
+      }).join('');
+
+      document.getElementById('ocTotalAmount').textContent = fmt(o.total_amount);
+
+      const cancelBtn = document.getElementById('ocCancelBtn');
+      const cancelable = !['취소완료','배송중','배송완료'].includes(o.status);
+      cancelBtn.style.display = cancelable ? 'block' : 'none';
+
+      document.getElementById('ocResult').style.display = 'block';
+    }
+
+    function openCancelModal() {
+      document.getElementById('ocCancelModal').classList.add('open');
+    }
+    function closeCancelModal() {
+      document.getElementById('ocCancelModal').classList.remove('open');
+    }
+
+    async function confirmCancel() {
+      if (!currentOrder) return;
+      const reason = document.getElementById('ocCancelReason').value.trim() || '고객 요청';
+      const btn = document.querySelector('.oc-modal-cancel-ok');
+      btn.disabled = true;
+      btn.textContent = '처리 중...';
+
+      try {
+        const res = await fetch(`${SERVER}/api/order/cancel`, {
+          method : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body   : JSON.stringify({ orderId: currentOrder.order_id, phone4: document.getElementById('ocPhone4').value.trim(), reason }),
+        });
+        const data = await res.json();
+        if (!res.ok) { alert(data.error || '취소에 실패했습니다.'); return; }
+        closeCancelModal();
+        alert('주문이 취소되었습니다.');
+        searchOrder();
+      } catch(e) {
+        alert('서버 연결에 실패했습니다.');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '취소 확인';
+      }
+    }
+
+    document.getElementById('ocPhone4').addEventListener('keydown', e => {
+      if (e.key === 'Enter') searchOrder();
+    });
+    document.getElementById('ocOrderId').addEventListener('keydown', e => {
+      if (e.key === 'Enter') document.getElementById('ocPhone4').focus();
+    });
+  </script>
+</body>
+</html>

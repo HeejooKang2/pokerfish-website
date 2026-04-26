@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — POKERFISH</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+  <link rel="stylesheet" href="../component/base.css">
+  <style>
+    body { padding: 0; overflow-x: auto; }
+
+    /* 비밀번호 오버레이 */
+    .ad-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--black);
+      z-index: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .ad-overlay-box {
+      width: 100%;
+      max-width: 360px;
+      background: var(--gray-900);
+      border: 1px solid rgba(255,255,255,0.08);
+      padding: 48px 36px;
+      text-align: center;
+    }
+    .ad-overlay-logo {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.38em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .ad-overlay-sub {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      color: var(--gray-400);
+      margin-bottom: 32px;
+      text-transform: uppercase;
+    }
+    .ad-overlay-input {
+      width: 100%;
+      background: var(--black);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: var(--white);
+      font-family: 'Pretendard', sans-serif;
+      font-size: 14px;
+      padding: 14px 16px;
+      outline: none;
+      margin-bottom: 12px;
+      text-align: center;
+      letter-spacing: 0.1em;
+    }
+    .ad-overlay-input:focus { border-color: rgba(255,255,255,0.4); }
+    .ad-overlay-btn {
+      width: 100%;
+      padding: 15px;
+      background: var(--white);
+      color: var(--black);
+      border: none;
+      font-family: 'Pretendard', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    .ad-overlay-btn:hover { background: var(--gray-100); }
+    .ad-overlay-err {
+      font-size: 11px;
+      color: #e05555;
+      margin-top: 10px;
+      display: none;
+    }
+
+    /* 헤더 */
+    .ad-header {
+      position: sticky;
+      top: 0;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      background: var(--gray-900);
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      z-index: 100;
+    }
+    .ad-logo {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--white);
+      text-decoration: none;
+    }
+    .ad-header-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .ad-total-count {
+      font-size: 11px;
+      color: var(--gray-400);
+    }
+    .ad-refresh-btn {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      color: var(--white);
+      background: none;
+      border: 1px solid rgba(255,255,255,0.2);
+      padding: 7px 14px;
+      cursor: pointer;
+      font-family: 'Pretendard', sans-serif;
+      transition: border-color 0.15s;
+    }
+    .ad-refresh-btn:hover { border-color: rgba(255,255,255,0.5); }
+
+    /* 필터 바 */
+    .ad-filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 32px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      flex-wrap: wrap;
+    }
+    .ad-filter-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      color: var(--gray-400);
+      text-transform: uppercase;
+    }
+    .ad-filter-btn {
+      font-size: 11px;
+      padding: 6px 14px;
+      background: none;
+      color: var(--gray-400);
+      border: 1px solid rgba(255,255,255,0.1);
+      cursor: pointer;
+      font-family: 'Pretendard', sans-serif;
+      transition: all 0.15s;
+    }
+    .ad-filter-btn.active, .ad-filter-btn:hover {
+      color: var(--white);
+      border-color: rgba(255,255,255,0.4);
+    }
+    .ad-search-input {
+      margin-left: auto;
+      background: var(--black);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: var(--white);
+      font-family: 'Pretendard', sans-serif;
+      font-size: 12px;
+      padding: 7px 14px;
+      outline: none;
+      width: 220px;
+    }
+    .ad-search-input:focus { border-color: rgba(255,255,255,0.3); }
+    .ad-search-input::placeholder { color: var(--gray-600); }
+
+    /* 테이블 */
+    .ad-table-wrap {
+      padding: 24px 32px 64px;
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 900px;
+    }
+    thead th {
+      text-align: left;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gray-400);
+      padding: 12px 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      white-space: nowrap;
+    }
+    tbody tr {
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      transition: background 0.1s;
+    }
+    tbody tr:hover { background: rgba(255,255,255,0.025); }
+    tbody td {
+      padding: 14px 10px;
+      font-size: 12px;
+      vertical-align: middle;
+    }
+
+    .ad-status-badge {
+      display: inline-block;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border: 1px solid;
+      white-space: nowrap;
+    }
+    .st-결제완료  { color: #6fa3ef; border-color: rgba(111,163,239,0.4); }
+    .st-배송준비  { color: #f0c040; border-color: rgba(240,192,64,0.4);  }
+    .st-배송중   { color: #5dcfa0; border-color: rgba(93,207,160,0.4);   }
+    .st-배송완료  { color: var(--gray-400); border-color: rgba(136,136,136,0.3); }
+    .st-취소완료  { color: #e05555; border-color: rgba(220,85,85,0.3);   }
+
+    .ad-select {
+      background: var(--black);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: var(--white);
+      font-family: 'Pretendard', sans-serif;
+      font-size: 11px;
+      padding: 6px 10px;
+      outline: none;
+      cursor: pointer;
+    }
+    .ad-track-row {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .ad-track-input {
+      background: var(--black);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: var(--white);
+      font-family: 'Pretendard', sans-serif;
+      font-size: 11px;
+      padding: 6px 10px;
+      outline: none;
+      width: 130px;
+    }
+    .ad-track-input:focus { border-color: rgba(255,255,255,0.3); }
+    .ad-save-btn {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      padding: 6px 12px;
+      background: none;
+      color: var(--white);
+      border: 1px solid rgba(255,255,255,0.25);
+      cursor: pointer;
+      font-family: 'Pretendard', sans-serif;
+      white-space: nowrap;
+      transition: border-color 0.15s;
+    }
+    .ad-save-btn:hover { border-color: var(--white); }
+    .ad-save-btn.saved { color: #5dcfa0; border-color: rgba(93,207,160,0.5); }
+
+    .ad-goods-name {
+      max-width: 160px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: var(--gray-400);
+    }
+    .ad-amount { font-variant-numeric: tabular-nums; font-weight: 500; }
+
+    .ad-empty {
+      text-align: center;
+      color: var(--gray-400);
+      font-size: 12px;
+      padding: 60px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 비밀번호 오버레이 -->
+  <div class="ad-overlay" id="adOverlay">
+    <div class="ad-overlay-box">
+      <p class="ad-overlay-logo">Pokerfish</p>
+      <p class="ad-overlay-sub">Admin Panel</p>
+      <input class="ad-overlay-input" id="adPwInput" type="password" placeholder="비밀번호" autocomplete="current-password">
+      <button class="ad-overlay-btn" onclick="login()">로그인</button>
+      <p class="ad-overlay-err" id="adPwErr">비밀번호가 올바르지 않습니다.</p>
+    </div>
+  </div>
+
+  <!-- 메인 -->
+  <div id="adMain" style="display:none;">
+    <header class="ad-header">
+      <a class="ad-logo" href="../index.html">Pokerfish</a>
+      <div class="ad-header-right">
+        <span class="ad-total-count" id="adTotalCount"></span>
+        <button class="ad-refresh-btn" onclick="loadOrders()">Refresh</button>
+      </div>
+    </header>
+
+    <div class="ad-filter-bar">
+      <span class="ad-filter-label">Status</span>
+      <button class="ad-filter-btn active" data-filter="전체" onclick="setFilter(this)">전체</button>
+      <button class="ad-filter-btn" data-filter="결제완료" onclick="setFilter(this)">결제완료</button>
+      <button class="ad-filter-btn" data-filter="배송준비" onclick="setFilter(this)">배송준비</button>
+      <button class="ad-filter-btn" data-filter="배송중" onclick="setFilter(this)">배송중</button>
+      <button class="ad-filter-btn" data-filter="배송완료" onclick="setFilter(this)">배송완료</button>
+      <button class="ad-filter-btn" data-filter="취소완료" onclick="setFilter(this)">취소완료</button>
+      <input class="ad-search-input" id="adSearch" type="text" placeholder="주문번호 / 이름 / 연락처 검색" oninput="renderTable()">
+    </div>
+
+    <div class="ad-table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>주문일시</th>
+            <th>주문번호</th>
+            <th>이름</th>
+            <th>연락처</th>
+            <th>상품</th>
+            <th>결제금액</th>
+            <th>결제수단</th>
+            <th>상태</th>
+            <th>운송장</th>
+          </tr>
+        </thead>
+        <tbody id="adTableBody"></tbody>
+      </table>
+      <p class="ad-empty" id="adEmpty" style="display:none;">주문이 없습니다.</p>
+    </div>
+  </div>
+
+  <script>
+    const SERVER = 'http://localhost:3000';
+    const fmt = n => Number(n).toLocaleString('ko-KR') + '원';
+
+    let adminKey = '';
+    let allOrders = [];
+    let currentFilter = '전체';
+
+    async function login() {
+      const pw = document.getElementById('adPwInput').value;
+      const res = await fetch(`${SERVER}/api/admin/orders`, {
+        headers: { 'x-admin-key': pw }
+      });
+      if (res.status === 401) {
+        document.getElementById('adPwErr').style.display = 'block';
+        return;
+      }
+      adminKey = pw;
+      sessionStorage.setItem('pf_admin_key', pw);
+      document.getElementById('adOverlay').style.display = 'none';
+      document.getElementById('adMain').style.display = 'block';
+      allOrders = await res.json();
+      renderTable();
+    }
+
+    async function loadOrders() {
+      const res = await fetch(`${SERVER}/api/admin/orders`, {
+        headers: { 'x-admin-key': adminKey }
+      });
+      if (!res.ok) return;
+      allOrders = await res.json();
+      renderTable();
+    }
+
+    function setFilter(btn) {
+      document.querySelectorAll('.ad-filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentFilter = btn.dataset.filter;
+      renderTable();
+    }
+
+    function renderTable() {
+      const keyword = document.getElementById('adSearch').value.trim().toLowerCase();
+      let rows = allOrders;
+      if (currentFilter !== '전체') rows = rows.filter(o => o.status === currentFilter);
+      if (keyword) rows = rows.filter(o =>
+        o.order_id.toLowerCase().includes(keyword) ||
+        o.name.includes(keyword) ||
+        o.phone.includes(keyword)
+      );
+
+      document.getElementById('adTotalCount').textContent = `총 ${rows.length}건`;
+      const tbody = document.getElementById('adTableBody');
+
+      if (rows.length === 0) {
+        tbody.innerHTML = '';
+        document.getElementById('adEmpty').style.display = 'block';
+        return;
+      }
+      document.getElementById('adEmpty').style.display = 'none';
+
+      const statuses = ['결제완료', '배송준비', '배송중', '배송완료', '취소완료'];
+
+      tbody.innerHTML = rows.map(o => `
+        <tr>
+          <td style="color:var(--gray-400); white-space:nowrap;">${o.created_at}</td>
+          <td style="font-size:11px; color:var(--gray-400);">${o.order_id}</td>
+          <td>${o.name}</td>
+          <td style="color:var(--gray-400);">${o.phone}</td>
+          <td><div class="ad-goods-name" title="${o.goods_name}">${o.goods_name}</div></td>
+          <td class="ad-amount">${fmt(o.total_amount)}</td>
+          <td style="color:var(--gray-400);">${o.payment_method}</td>
+          <td>
+            <select class="ad-select" data-orderid="${o.order_id}" onchange="statusChanged(this)">
+              ${statuses.map(s => `<option value="${s}" ${s === o.status ? 'selected' : ''}>${s}</option>`).join('')}
+            </select>
+          </td>
+          <td>
+            <div class="ad-track-row">
+              <input class="ad-track-input" data-orderid="${o.order_id}" type="text"
+                placeholder="운송장 번호" value="${o.tracking_number || ''}">
+              <button class="ad-save-btn" data-orderid="${o.order_id}" onclick="saveTracking(this)">저장</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function statusChanged(sel) {
+      const orderId = sel.dataset.orderid;
+      await patchOrder(orderId, { status: sel.value });
+      const idx = allOrders.findIndex(o => o.order_id === orderId);
+      if (idx !== -1) allOrders[idx].status = sel.value;
+    }
+
+    async function saveTracking(btn) {
+      const orderId = btn.dataset.orderid;
+      const row = btn.closest('tr');
+      const input = row.querySelector('.ad-track-input');
+      await patchOrder(orderId, { trackingNumber: input.value.trim() });
+      btn.textContent = '저장됨';
+      btn.classList.add('saved');
+      setTimeout(() => { btn.textContent = '저장'; btn.classList.remove('saved'); }, 2000);
+      const idx = allOrders.findIndex(o => o.order_id === orderId);
+      if (idx !== -1) allOrders[idx].tracking_number = input.value.trim();
+    }
+
+    async function patchOrder(orderId, body) {
+      await fetch(`${SERVER}/api/admin/orders/${orderId}`, {
+        method : 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey },
+        body   : JSON.stringify(body),
+      });
+    }
+
+    // 세션에 비밀번호 저장돼 있으면 자동 로그인
+    const savedKey = sessionStorage.getItem('pf_admin_key');
+    if (savedKey) {
+      document.getElementById('adPwInput').value = savedKey;
+      login();
+    }
+
+    document.getElementById('adPwInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') login();
+    });
+  </script>
+</body>
+</html>

@@ -21,6 +21,21 @@
   text-decoration: none;
 }
 
+.header-icons {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.order-check-btn {
+  display: flex;
+  align-items: center;
+  color: var(--white);
+  padding: 8px;
+  transition: opacity 0.2s;
+}
+.order-check-btn:hover { opacity: 0.6; }
+
 .cart-btn {
   position: relative;
   background: none;
